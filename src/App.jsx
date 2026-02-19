@@ -1,14 +1,20 @@
-import { useState } from "react";
 import { PRODUCTS } from "./data/products";
 import { FiltersPanel } from "./components/FiltersPanel";
 import { ProductList } from "./components/ProductList";
 import { useVisibleProducts } from "./hooks/useVisibleProducts";
+import { useLocalStorageState } from "./hooks/useLocalStorageState";
 
 export default function App() {
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [sort, setSort] = useState("none");
+  const [search, setSearch] = useLocalStorageState("filters.search", "");
+  const [category, setCategory] = useLocalStorageState(
+    "filters.category",
+    "all",
+  );
+  const [inStockOnly, setInStockOnly] = useLocalStorageState(
+    "filters.inStockOnly",
+    false,
+  );
+  const [sort, setSort] = useLocalStorageState("filters.sort", "none");
 
   const { categories, visibleProducts } = useVisibleProducts(PRODUCTS, {
     search,
@@ -22,6 +28,8 @@ export default function App() {
     setCategory("all");
     setInStockOnly(false);
     setSort("none");
+    // No hace falta hacer localStorage.removeItem aquí:
+    // el hook detecta "volvió al initial" y borra la key automáticamente.
   };
 
   return (
