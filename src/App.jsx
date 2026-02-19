@@ -1,10 +1,12 @@
-import { PRODUCTS } from "./data/products";
 import { FiltersPanel } from "./components/FiltersPanel";
 import { ProductList } from "./components/ProductList";
 import { useVisibleProducts } from "./hooks/useVisibleProducts";
 import { useLocalStorageState } from "./hooks/useLocalStorageState";
+import { useProducts } from "./hooks/useProducts";
 
 export default function App() {
+  const { products, status, error } = useProducts();
+
   const [search, setSearch] = useLocalStorageState("filters.search", "");
   const [category, setCategory] = useLocalStorageState(
     "filters.category",
@@ -16,7 +18,7 @@ export default function App() {
   );
   const [sort, setSort] = useLocalStorageState("filters.sort", "none");
 
-  const { categories, visibleProducts } = useVisibleProducts(PRODUCTS, {
+  const { categories, visibleProducts } = useVisibleProducts(products, {
     search,
     category,
     inStockOnly,
@@ -28,13 +30,11 @@ export default function App() {
     setCategory("all");
     setInStockOnly(false);
     setSort("none");
-    // No hace falta hacer localStorage.removeItem aquí:
-    // el hook detecta "volvió al initial" y borra la key automáticamente.
   };
 
   return (
     <div className="font-sans p-4 max-w-[900px] mx-auto">
-      <h1>Día 2 — Estado + Eventos (Refactor a componentes)</h1>
+      <h1>Catálogo — filtros + fetch</h1>
 
       <FiltersPanel
         search={search}
@@ -50,8 +50,22 @@ export default function App() {
       />
 
       <section className="mt-4">
-        <h2>Resultados ({visibleProducts.length})</h2>
-        <ProductList products={visibleProducts} />
+        {status === "loading" && (
+          <p>Cargando productos… (respira, no es un bug 😄)</p>
+        )}
+
+        {status === "error" && (
+          <p className="text-red-400">
+            Error cargando productos: {error?.message}
+          </p>
+        )}
+
+        {status === "success" && (
+          <>
+            <h2>Resultados ({visibleProducts.length})</h2>
+            <ProductList products={visibleProducts} />
+          </>
+        )}
       </section>
     </div>
   );
