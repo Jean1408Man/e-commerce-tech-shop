@@ -5,17 +5,16 @@ import {
   formatMoney,
   withFinalPrice,
 } from "../utils/productTransforms";
+import { useCart } from "../context/CartContext";
 
 export function ProductDetail({ products, status, error }) {
   const { id } = useParams();
+  const { add } = useCart();
 
-  // Aseguramos finalPrice también en detalle
   const enriched = useMemo(() => withFinalPrice(products), [products]);
   const product = useMemo(() => findById(enriched, id), [enriched, id]);
 
-  if (status === "loading") {
-    return <p>Cargando producto…</p>;
-  }
+  if (status === "loading") return <p>Cargando producto…</p>;
 
   if (status === "error") {
     return (
@@ -41,9 +40,14 @@ export function ProductDetail({ products, status, error }) {
 
   return (
     <div className="mt-4">
-      <Link className="underline" to="/">
-        ← Volver
-      </Link>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <Link className="underline" to="/">
+          ← Volver
+        </Link>
+        <Link className="underline" to="/cart">
+          Ir al carrito
+        </Link>
+      </div>
 
       <h2 className="mt-3 text-2xl font-bold">{product.name}</h2>
 
@@ -71,6 +75,14 @@ export function ProductDetail({ products, status, error }) {
         >
           {product.stock > 0 ? `Stock: ${product.stock}` : "SIN STOCK"}
         </p>
+
+        <button
+          onClick={() => add(product.id)}
+          disabled={product.stock === 0}
+          className="mt-3 px-3 py-2 bg-gray-700 hover:bg-gray-600 rounded transition-colors text-sm font-medium disabled:opacity-50"
+        >
+          Añadir al carrito
+        </button>
       </div>
     </div>
   );
