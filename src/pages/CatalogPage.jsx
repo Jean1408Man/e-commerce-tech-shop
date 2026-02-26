@@ -46,7 +46,9 @@ export function CatalogPage({ products, status, error }) {
 
       <section className="mt-4">
         {status === "loading" && (
-          <p>Cargando productos… (React también parpadea a veces 😄)</p>
+          <p className="text-gray-400 animate-pulse">
+            Cargando catálogo de productos...
+          </p>
         )}
 
         {status === "error" && (

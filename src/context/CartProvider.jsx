@@ -1,12 +1,5 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useReducer,
-} from "react";
-
-const CartContext = createContext(null);
+import { useEffect, useMemo, useReducer } from "react";
+import { CartContext } from "./CartContext";
 const STORAGE_KEY = "cart.items.v1";
 
 function loadInitialCart() {
@@ -102,12 +95,4 @@ export function CartProvider({ children }) {
   }, [state.items, totalItems]);
 
   return <CartContext.Provider value={api}>{children}</CartContext.Provider>;
-}
-
-export function useCart() {
-  const ctx = useContext(CartContext);
-  if (!ctx) {
-    throw new Error("useCart debe usarse dentro de <CartProvider>");
-  }
-  return ctx;
 }
